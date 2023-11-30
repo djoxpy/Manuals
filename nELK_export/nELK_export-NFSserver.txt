@@ -1,0 +1,26 @@
+adduser -u 1002 uexport
+usermod -a -G uexport user-main
+chgrp uexport /opt/user-main/export
+vi /etc/fstab ----------------> /opt/user-main/export /export bind  defaults,bind   0 0
+mkdir /export
+mount /export
+ls -alh /opt/user-main/
+echo "/export 123.45.77.44(rw,all_squash,anonuid=1002,anongid=1002)" "123.45.77.46(rw,all_squash,anonuid=1002,anongid=1002)" "123.45.77.27(rw,all_squash,anonuid=1002,anongid=1002)" "123.45.77.43(rw,all_squash,anonuid=1002,anongid=1002)"  > /etc/exports.d/uexport.exports
+su - user-main
+sudo exportfs -rav
+exit
+systemctl restart nfs-config
+systemctl start nfs-server
+systemctl enable nfs-server
+showmount --exports
+ls -al /
+ls -al /opt/user-main/
+CHECK IF THE CLIENT HAS ACCESS
+set export_freq=60 in user-main.cfg --> for protocols that you want to export
+setup crontab to delete files older than 2-3 days from this directory
+
+---> Note -- if I have "Function not impleented" then do "exportfs -r", "exportfs -rav", "systemctl restart nfs-config" and "systemctl restart nfs-servers"
+
+first you have to enable nfs on the server and export specific folder
+adjust ip addresses to the one that uexport send us
+also check if userid and group id is the same

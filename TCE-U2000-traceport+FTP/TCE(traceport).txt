@@ -1,0 +1,59 @@
+CONFIDENTIAL
+
+======user-main.cfg========
+CONFIDENTIAL
+
+======FTP Server======
+yum install vsftpd
+rm -rf /etc/vsftpd/*
+copy vsftpd.conf to /etc/vsftpd/vsftpd.conf
+useradd -s /sbin/nologin ftp-user
+passwd ftp-user
+vi /etc/pam.d/vsftpd --> #auth required pam_shells.so
+mkdir /etc/vsftpd/users
+touch /etc/vsftpd/users/ftp-user
+echo 'local_root=/opt/ftp-user/' >> /etc/vsftpd/users/ftp-user
+cd /opt
+mkdir ftp-user && chmod 0777 ftp-user
+chown ftp-user. /opt/ftp-user/
+touch /etc/vsftpd/chroot_list
+echo 'root' >> /etc/vsftpd/chroot_list && echo 'user-main' >> /etc/vsftpd/chroot_list
+touch /etc/vsftpd/user_list
+echo 'root' >> /etc/vsftpd/user_list && echo 'ftp-user' >> /etc/vsftpd/user_list && echo 'user-main' >> /etc/vsftpd/user_list
+touch /var/log/vsftpd.log && chmod 600 /var/log/vsftpd.log
+systemctl enable vsftpd
+systemctl start vsftpd
+
+netstat -tulnp | grep vsftpd
+
+
+======= LFTP  -  Store traces =======
+2 main kinds of data download into 2 different folders
+Files must be stored as 'user-main' user
+yum install lftp
+su - user-main
+echo "set ftp:timezone -05" >> ~/.lftprc  #optionally
+echo "set ssl:verify-certificate/11.22.5.20 no" >> ~/.lftprc
+crontab -e
+### every 1min
+#*/1 * * * * /usr/bin/lftp -c "open 11.22.5.20; user ftpuser super_pswd; mirror --continue --depth-first -p --newer-than=now-5minutes --no-empty-dirs --exclude dataList/ --ignore-time --parallel=30 /opt/oss/server/var/fileint/TSNBI/LTE_CELL_TRC/ /opt/ftp-user/"
+#*/1 * * * * /usr/bin/lftp -c "open 11.22.5.20; user ftpuser super_pswd; mirror --continue --depth-first -p --newer-than=now-5minutes --no-empty-dirs --exclude dataList/ --ignore-time --parallel=30 /opt/oss/server/var/fileint/TSNBI/LTE_SIG/ /opt/ftp-user/"
+
+
+###--newer-than=  +5 hours for Uzbekistan
+###-v --> detail output
+
+===== COUNT ROWS BY TIMESTAMP =====
+SELECT count(*) FROM TCE_cf WHERE StartTime BETWEEN '2022-12-06 20:10:00' AND '2022-12-06 20:23:00';
+
+===== COUNT NUMBERS OF FILES BY TIME =====
+find /opt/ftp-user -type f -mmin -60
+
+=======SFTP  -  Store traces=======
+2 main kinds of data download into 2 different folders
+Files must be stored as 'user-main' user
+
+ sftp ftpuser@11.22.5.20
+ get -r/reget -r /opt/oss/server/var/fileint/TSNBI/LTE_CELL_TRC /opt/ftp-user/
+ get -r/reget -r /opt/oss/server/var/fileint/TSNBI/LTE_SIG /opt/ftp-user/
+ bye

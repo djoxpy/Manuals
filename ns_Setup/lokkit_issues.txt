@@ -1,0 +1,3 @@
+if the server is not receiving packets  -->  
+
+lokkit -t eno50 --update    

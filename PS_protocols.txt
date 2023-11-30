@@ -1,0 +1,11 @@
+S1-AP
+S6a
+SGs
+IuPS
+S13
+Gy
+Gx
+S11
+Gn_SGSN
+Gn_GGSN (Roam)
+S5/S8 (Roam)"

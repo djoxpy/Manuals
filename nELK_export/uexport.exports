@@ -1,0 +1,1 @@
+/export 123.45.77.44(rw,all_squash,anonuid=1002,anongid=1002) 123.45.77.46(rw,all_squash,anonuid=1002,anongid=1002) 123.45.77.27(rw,all_squash,anonuid=1002,anongid=1002) 123.45.77.43(rw,all_squash,anonuid=1002,anongid=1002)
